@@ -1,10 +1,10 @@
-# Kondukt Product Requirements Document
+# utmato Product Requirements Document
 
 ## Document Control
 
 | Document Information |                                        |
 |----------------------|----------------------------------------|
-| Document Title       | Kondukt Product Requirements Document  |
+| Document Title       | utmato Product Requirements Document  |
 | Version              | 1.0                                    |
 | Status               | Draft                                  |
 | Date                 | May 18, 2025                           |
@@ -22,37 +22,29 @@
 
 ## Introduction
 
-This Product Requirements Document (PRD) outlines the specifications and requirements for Kondukt, a SaaS tool designed to help marketing teams plan, create, and track marketing campaigns with improved targeting and link management capabilities. The document serves as a comprehensive guide for the development team to understand the product's functionality, features, and technical specifications.
+This Product Requirements Document (PRD) outlines the specifications and requirements for utmato, a SaaS tool designed to help marketing teams plan, create, and track marketing campaigns with improved targeting and link management capabilities. The document serves as a comprehensive guide for the development team to understand the product's functionality, features, and technical specifications.
 
 The PRD aims to define clear requirements for each feature, establish acceptance criteria, and provide a framework for development and testing. It will serve as the primary reference throughout the development lifecycle and provide transparency to all stakeholders involved in the project.
 
 ## Product overview
 
-Kondukt is a marketing campaign management platform that simplifies campaign planning, targeting, and tracking for marketing teams. The platform focuses on two key areas in its first phase:
+utmato is a marketing campaign management platform that simplifies campaign planning, targeting, and tracking for marketing teams. The platform focuses on two key areas in its first phase:
 
-1. **Campaign setup with advanced targeting**: Enabling marketers to define and create campaigns with precise audience targeting parameters (demographics, location, interests) to improve campaign performance.
+1. **Campaign setup with advanced targeting**: Enabling marketers to define and create campaigns identifiers mapped to precise audience targeting parameters (demographics, location, interests) to improve campaign performance.
 
 2. **Centralized UTM link management**: Providing a unified system for creating, managing, and tracking campaign links with proper UTM parameters for consistent attribution and analytics.
 
-Kondukt offers a subscription-based service with both monthly and yearly billing options, team collaboration features, and comprehensive campaign analytics. The platform serves as a central hub for marketing teams to organize their digital campaigns across multiple platforms while maintaining consistent tracking and targeting parameters.
+utmato offers a subscription-based service with both monthly and yearly billing options, team collaboration features, and comprehensive campaign analytics. The platform serves as a central hub for marketing teams to organize their digital campaigns across multiple platforms while maintaining consistent tracking and targeting parameters.
 
 ## Goals and objectives
 
 ### Primary goals
 
 1. Simplify campaign planning and management for marketing teams
-2. Streamline the creation and management of UTM-tagged links
-3. Improve campaign performance through better audience targeting
-4. Provide a centralized platform for tracking campaign metadata
-5. Enable team collaboration for marketing initiatives
+2. Streamline the creation , management, storage of UTM-tagged links , standardise them across different channels
+4. Provide a centralized platform for managing campaign metadata
+5. Enable team collaboration for managing campaign metdata together.
 
-### Measurable objectives
-
-1. Reduce the time spent on campaign setup by 50%
-2. Decrease UTM parameter errors by 90%
-3. Improve campaign performance metrics by 25% through better targeting
-4. Achieve 85% user retention after the 7-day free trial
-5. Maintain an average user satisfaction score of 4.5/5 or higher
 
 ### Success criteria
 
@@ -102,6 +94,7 @@ Kondukt offers a subscription-based service with both monthly and yearly billing
 - Team member invitation system
 
 #### 1.2 User roles and permissions
+- Manager to have the ability to add new domains and manage domains . 
 - Manager role with full access to create domains, invite users, and manage campaigns
 - Team member role with limited permissions based on manager-defined access
 - Domain-based organization structure
@@ -116,7 +109,7 @@ Kondukt offers a subscription-based service with both monthly and yearly billing
 - Hierarchical targeting criteria selection
 - Audience and interest selection
 - Campaign ID generation and management
-- Dashboard for campaign overview
+- Dashboard for campaign overview got all IDs created and stored.
 
 #### 2.2 Campaign metadata management
 - Campaign editing capabilities
@@ -175,6 +168,7 @@ Kondukt offers a subscription-based service with both monthly and yearly billing
 - Clerk authentication integration
 - API development and documentation
 - Data model implementation
+- Python * FAST API
 
 #### 7.2 Error monitoring and logging
 - Sentry integration for real-time error tracking
@@ -188,7 +182,7 @@ Kondukt offers a subscription-based service with both monthly and yearly billing
 
 #### ST-101: User registration as marketing manager
 **As a** marketing professional,  
-**I want to** register as a marketing manager on Kondukt,  
+**I want to** register as a marketing manager on utmato,  
 **So that** I can start managing my marketing campaigns.
 
 **Acceptance criteria:**
@@ -201,7 +195,7 @@ Kondukt offers a subscription-based service with both monthly and yearly billing
 
 #### ST-102: User login
 **As a** registered user,  
-**I want to** log in to my Kondukt account,  
+**I want to** log in to my utmato account,  
 **So that** I can access my campaign management dashboard.
 
 **Acceptance criteria:**
@@ -214,7 +208,7 @@ Kondukt offers a subscription-based service with both monthly and yearly billing
 
 #### ST-103: Manager inviting team members
 **As a** marketing manager,  
-**I want to** invite team members to join my domain on Kondukt,  
+**I want to** invite team members to join my domain on utmato,  
 **So that** we can collaborate on campaign management.
 
 **Acceptance criteria:**
@@ -381,7 +375,7 @@ Kondukt offers a subscription-based service with both monthly and yearly billing
 
 #### ST-501: Starting free trial
 **As a** new user,  
-**I want to** start a free trial of Kondukt,  
+**I want to** start a free trial of utmato,  
 **So that** I can evaluate the platform before committing.
 
 **Acceptance criteria:**
@@ -395,7 +389,7 @@ Kondukt offers a subscription-based service with both monthly and yearly billing
 
 #### ST-502: Managing subscription
 **As a** marketing manager,  
-**I want to** manage my subscription to Kondukt,  
+**I want to** manage my subscription to utmato,  
 **So that** I can control billing and access.
 
 **Acceptance criteria:**
@@ -410,7 +404,7 @@ Kondukt offers a subscription-based service with both monthly and yearly billing
 #### ST-503: Upgrading to paid plan
 **As a** marketing manager,  
 **I want to** upgrade to a paid subscription,  
-**So that** I can continue using Kondukt after my trial.
+**So that** I can continue using utmato after my trial.
 
 **Acceptance criteria:**
 1. Manager can select between monthly ($7.99/month/domain) and yearly ($5.99/month/domain) plans

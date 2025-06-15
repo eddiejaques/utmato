@@ -1,0 +1,440 @@
+# Product Requirements Document (PRD) for UTMato
+
+**Product Name:** UTMato  
+**Prepared By:** [Your Name]  
+**Date:** [Today's Date]  
+**Version:** 1.0  
+**Target Development Environment:** Cursor/AI-Assisted Development
+
+---
+
+## Executive Summary
+
+UTMato is a web-based SaaS application that streamlines UTM parameter creation and campaign metadata management for digital marketing teams.
+ The platform enables domain-scoped workspaces, team collaboration, and automated URL generation with comprehensive tracking capabilities.
+
+**Core Value Proposition:** Eliminate manual UTM creation errors and standardize campaign tracking across marketing teams.
+
+---
+
+## Technical Architecture Overview
+
+### Stack Requirements
+- **Backend:** FastAPI (Python 3.11+)
+- **Database:** PostgreSQL with Supabase
+- **Frontend:** React 18+ with TypeScript
+- **Styling:** TailwindCSS
+- **Monorepo:** TurboRepo or Nx
+- **Auth:** Supabase Auth with role-based access control
+- **Hosting:** Supabase (backend + database) + Vercel/Netlify (frontend)
+
+### Database Schema Requirements
+
+```sql
+-- Users table
+users (
+  id: UUID PRIMARY KEY,
+  email: VARCHAR(255) UNIQUE NOT NULL,
+  created_at: TIMESTAMP,
+  updated_at: TIMESTAMP
+)
+
+-- Domains table
+domains (
+  id: UUID PRIMARY KEY,
+  domain_name: VARCHAR(255) NOT NULL,
+  created_by: UUID REFERENCES users(id),
+  created_at: TIMESTAMP
+)
+
+-- User domain access table
+user_domain_access (
+  id: UUID PRIMARY KEY,
+  user_id: UUID REFERENCES users(id),
+  domain_id: UUID REFERENCES domains(id),
+  role: ENUM('manager', 'team_member'),
+  invited_at: TIMESTAMP,
+  joined_at: TIMESTAMP
+)
+
+-- Campaigns table
+campaigns (
+  id: UUID PRIMARY KEY,
+  campaign_id: VARCHAR(50) UNIQUE NOT NULL, -- CMP001, CMP002, etc.
+  domain_id: UUID REFERENCES domains(id),
+  name: VARCHAR(255) NOT NULL,
+  campaign_type: VARCHAR(100),
+  targeting_criteria: JSONB,
+  created_by: UUID REFERENCES users(id),
+  created_at: TIMESTAMP,
+  updated_at: TIMESTAMP
+)
+
+-- UTM configurations table
+utm_configs (
+  id: UUID PRIMARY KEY,
+  campaign_id: UUID REFERENCES campaigns(id),
+  utm_source: VARCHAR(255) NOT NULL,
+  utm_medium: VARCHAR(255) NOT NULL,
+  utm_campaign: VARCHAR(255),
+  utm_content: VARCHAR(255),
+  utm_term: VARCHAR(255),
+  generated_url: TEXT NOT NULL,
+  created_by: UUID REFERENCES users(id),
+  created_at: TIMESTAMP
+)
+```
+
+---
+
+## Feature Specifications
+
+### 1. Landing Page & Authentication
+
+**Acceptance Criteria:**
+- [ ] Responsive landing page with hero section, features overview, and CTA
+- [ ] Email/password registration form with domain input requirement
+- [ ] Email verification flow
+- [ ] Login/logout functionality
+- [ ] Password reset capability
+- [ ] Input validation with error messaging
+
+**Technical Requirements:**
+- React Router for navigation
+- Supabase Auth integration
+- Form validation using React Hook Form + Zod
+- Responsive design (mobile-first)
+
+**API Endpoints:**
+```
+POST /auth/register
+POST /auth/login
+POST /auth/logout
+POST /auth/reset-password
+```
+
+### 2. Domain Management System
+
+**Acceptance Criteria:**
+- [ ] Domain setup wizard for new users
+- [ ] Domain validation (basic URL format checking)
+- [ ] Multiple domain support for managers
+- [ ] Domain switching interface
+- [ ] Domain deletion with confirmation
+
+**Technical Requirements:**
+- Domain validation regex
+- Context API for current domain state
+- Protected routes based on domain access
+
+**API Endpoints:**
+```
+POST /domains
+GET /domains (user's accessible domains)
+PUT /domains/:id
+DELETE /domains/:id
+```
+
+### 3. Team Collaboration System
+
+**Acceptance Criteria:**
+- [ ] Email invitation system with expiration (7 days)
+- [ ] Role-based access control (Manager/Team Member)
+- [ ] Team member list with status indicators
+- [ ] Remove team member functionality
+- [ ] Pending invitation management
+
+**Technical Requirements:**
+- Email service integration (Supabase Edge Functions)
+- JWT tokens for invitation links
+- Role-based component rendering
+
+**API Endpoints:**
+```
+POST /teams/:domain_id/invite
+GET /teams/:domain_id/members
+DELETE /teams/:domain_id/members/:user_id
+POST /teams/accept-invitation/:token
+```
+
+### 4. Campaign Management
+
+**Acceptance Criteria:**
+- [ ] Campaign creation form with auto-generated Campaign ID
+- [ ] Campaign type selection (dropdown: Awareness, Reengagement, Exclusion, Custom)
+- [ ] Targeting criteria builder (Demographics, Interests, Custom Audiences)
+- [ ] Campaign list view with search and filtering
+- [ ] Campaign editing and deletion
+- [ ] Bulk campaign operations
+
+**Technical Requirements:**
+- Auto-incrementing Campaign ID generation (CMP001, CMP002...)
+- JSONB storage for flexible targeting criteria
+- Search functionality with debouncing
+- Pagination for large campaign lists
+
+**API Endpoints:**
+```
+POST /campaigns
+GET /campaigns?domain_id=:id&search=:query&page=:num
+PUT /campaigns/:id
+DELETE /campaigns/:id
+GET /campaigns/:id
+```
+
+### 5. UTM Parameter Generator
+
+**Acceptance Criteria:**
+- [ ] UTM configuration form (source, medium, campaign, content, term)
+- [ ] Real-time URL preview
+- [ ] Multiple UTM configs per campaign
+- [ ] UTM parameter validation
+- [ ] Bulk UTM generation
+- [ ] URL copying functionality
+- [ ] QR code generation for URLs
+
+**Technical Requirements:**
+- URL building utility functions
+- Clipboard API integration
+- QR code library integration
+- Form state management
+
+**API Endpoints:**
+```
+POST /campaigns/:id/utm-configs
+GET /campaigns/:id/utm-configs
+PUT /utm-configs/:id
+DELETE /utm-configs/:id
+```
+
+### 6. Campaign Dashboard
+
+**Acceptance Criteria:**
+- [ ] Tabular campaign overview with sorting
+- [ ] UTM configuration status indicators
+- [ ] Quick actions (Edit, Add UTM, Copy URLs)
+- [ ] Export functionality (CSV, Excel)
+- [ ] Dashboard filters (status, campaign type, date range)
+- [ ] Bulk selection and operations
+
+**Technical Requirements:**
+- Data table component with sorting/filtering
+- Export utilities
+- Responsive table design
+- Loading states and error handling
+
+**API Endpoints:**
+```
+GET /dashboard/:domain_id?filters=:params
+POST /dashboard/:domain_id/export
+```
+
+---
+
+## User Interface Requirements
+
+### Design System
+- **Color Palette:** Primary (#3B82F6), Secondary (#10B981), Neutral (#6B7280)
+- **Typography:** Inter font family
+- **Components:** Headless UI or Radix UI with TailwindCSS
+- **Icons:** Lucide React or Heroicons
+- **Responsive Breakpoints:** sm (640px), md (768px), lg (1024px), xl (1280px)
+
+### Key UI Components Needed
+- [ ] Navigation bar with domain switcher
+- [ ] Form components (input, select, textarea, checkbox)
+- [ ] Data table with sorting/filtering
+- [ ] Modal dialogs
+- [ ] Toast notifications
+- [ ] Loading spinners and skeletons
+- [ ] Empty states
+- [ ] Error boundaries
+
+---
+
+## API Specifications
+
+### Authentication Middleware
+```javascript
+// Protect routes requiring authentication
+const requireAuth = (req, res, next) => {
+  // Supabase JWT validation
+}
+
+// Protect routes requiring domain access
+const requireDomainAccess = (req, res, next) => {
+  // Check user has access to requested domain
+}
+```
+
+### Error Handling
+```javascript
+// Standardized error response format
+{
+  "error": true,
+  "message": "User-friendly error message",
+  "code": "ERROR_CODE",
+  "details": {} // Optional technical details
+}
+```
+
+### Response Formats
+```javascript
+// Success response format
+{
+  "success": true,
+  "data": {},
+  "meta": { // Optional pagination/metadata
+    "page": 1,
+    "total": 100,
+    "hasNext": true
+  }
+}
+```
+
+---
+
+## Testing Requirements
+
+### Unit Testing
+- [ ] API endpoint testing with pytest
+- [ ] React component testing with Jest/React Testing Library
+- [ ] Utility function testing
+- [ ] Database model testing
+
+### Integration Testing
+- [ ] Authentication flows
+- [ ] Campaign creation to UTM generation workflow
+- [ ] Team invitation and access control
+- [ ] Domain switching functionality
+
+### E2E Testing
+- [ ] Complete user signup and onboarding flow
+- [ ] Campaign management workflow
+- [ ] Team collaboration scenarios
+
+---
+
+## Security Requirements
+
+### Data Protection
+- [ ] Input sanitization and validation
+- [ ] SQL injection prevention
+- [ ] XSS protection
+- [ ] CSRF protection
+- [ ] Rate limiting on API endpoints
+
+### Access Control
+- [ ] Domain-scoped data access
+- [ ] Role-based feature access
+- [ ] Secure invitation token generation
+- [ ] Session management
+
+---
+
+## Performance Requirements
+
+### Backend Performance
+- [ ] Sub-200ms API response times
+- [ ] Database query optimization with indexing
+- [ ] Pagination for large datasets
+- [ ] Caching for frequently accessed data
+
+### Frontend Performance
+- [ ] Code splitting and lazy loading
+- [ ] Image optimization
+- [ ] Bundle size optimization (< 500KB initial load)
+- [ ] Core Web Vitals optimization
+
+---
+
+## Development Phases
+
+### Phase 1: MVP (2-3 weeks)
+1. **Week 1:** Authentication, domain setup, basic UI setup
+2. **Week 2:** Campaign management, team invitations
+3. **Week 3:** UTM generation, dashboard, testing
+
+### Phase 2: Enhancement (1-2 weeks)
+1. Export functionality
+2. Advanced filtering and search
+3. QR code generation
+4. Performance optimization
+
+### Phase 3: Future Features
+1. UTM templates
+2. Analytics integration
+3. Subscription billing
+4. MMP integrations
+
+---
+
+## Development Setup Instructions
+
+### Prerequisites
+```bash
+Node.js 18+
+Python 3.11+
+PostgreSQL 14+
+```
+
+### Project Structure
+```
+utmato/
+├── apps/
+│   ├── web/          # React frontend
+│   └── api/          # FastAPI backend
+├── packages/
+│   ├── ui/           # Shared UI components
+│   ├── utils/        # Shared utilities
+│   └── types/        # TypeScript type definitions
+├── turbo.json
+└── package.json
+```
+
+### Environment Variables
+```bash
+# Backend (.env)
+DATABASE_URL=postgresql://...
+SUPABASE_URL=https://...
+SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_KEY=...
+EMAIL_SERVICE_API_KEY=...
+
+# Frontend (.env.local)
+NEXT_PUBLIC_SUPABASE_URL=https://...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+```
+
+---
+
+## Success Metrics
+
+### Technical Metrics
+- [ ] 99.9% uptime
+- [ ] Sub-200ms average API response time
+- [ ] Zero security vulnerabilities
+- [ ] 90%+ test coverage
+
+### Business Metrics
+- [ ] User onboarding completion rate > 80%
+- [ ] Campaign creation success rate > 95%
+- [ ] Team invitation acceptance rate > 70%
+
+---
+
+## Task Generation Guidelines for AI Tools
+
+This PRD is structured to enable AI development tools to generate specific tasks. Each feature section includes:
+- Clear acceptance criteria as checkboxes
+- Technical implementation requirements
+- API endpoint specifications
+- Database schema requirements
+- Testing requirements
+
+**Recommended AI Prompts:**
+- "Generate development tasks for the Campaign Management feature"
+- "Create API implementation for UTM parameter generation"
+- "Build React components for the dashboard interface"
+- "Set up database migrations for the campaign schema"
